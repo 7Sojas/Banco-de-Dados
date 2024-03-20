@@ -26,7 +26,7 @@ idSilos int primary key auto_increment,
 tamanhoSilo decimal (5),
 qtdSensores int,
 fk_Empresa int,
-constraint fk_Empresa_silos foreign key (fk_Empresa) references empresa(IdEmpresa)
+constraint fk_Empresa_silos foreign key (fk_Empresa) references empresa(idEmpresa)
 );
 
 insert into silos
@@ -43,7 +43,7 @@ numeroSensor int,
 dtInstalacao datetime,
 fk_Silo int,
 constraint ck_tipoSensor check(tipoSensor in('T','U')),
-constraint fk_Silos_sensores foreign key (fk_Silo) references Silos(IdSilos)
+constraint fk_Silos_sensores foreign key (fk_Silo) references Silos(idSilos)
 ) auto_increment = 1000;
 
 insert into sensores
