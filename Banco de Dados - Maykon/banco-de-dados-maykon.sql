@@ -7,9 +7,9 @@ use 7sojas;
 -- 1ª TABELA ========================================================
 
 -- CRIAR UMA TABELA PARA ARMAZENAR INFORMAÇÕES DO USUÁRIO, 
--- TENDO O ID DO USUÁRIO COMO CHAVE PRIMÁRIA QUE SE INCREMENTA A PARTIR DE 1
+-- TENDO O ID DE ATIVAÇÃO DE CONTA DO USUÁRIO COMO CHAVE PRIMÁRIA
 create table informacoesUsuario (
-idUsuario int primary key auto_increment,
+idAtivacao varchar(6) primary key,
 nomeUsuario varchar(45),
 emailUsuario varchar(75) unique, 
 -- "UNIQUE" ESTÁ SENDO UTILIZADO PARA INFORMAR QUE ESSE VALOR (EMAIL) DEVE SER ÚNICO, NÃO PERMITINDO REPETIÇÃO NOS DADOS
@@ -17,11 +17,10 @@ senhaUsuario varchar(20)
 );
 
 -- INSERINDO AS INFORMAÇÕES NA TABELA USUÁRIO, COM O NOME DA EMPRESA, EMAIL E SENHA
--- QUANDO UM VALOR É AUTO_INCREMENT OU NULL, NÃO É NECESSÁRIO COLOCAR SEUS DADOS NA TABELA, POIS ELES SE PREENCHEM SOZINHOS
-insert into informacoesUsuario (nomeUsuario, emailUsuario, senhaUsuario) values
-('Samil', 'samil@gmail.com', '#7SGR40S'),
-('Soya Silo', 'soyasilo@gmail.com', '#7SS1L0S'),
-('GNova', 'wgnova@gmail.com', '#7S4RM4Z3N4M3NT0');
+insert into informacoesUsuario(idAtivacao, nomeUsuario, emailUsuario, senhaUsuario) values
+('#7S001', 'Samil', 'samil@gmail.com', 'S4M1LGR40S'),
+('#7S002', 'Soya Silo', 'soyasilo@gmail.com', '#S0YM0SSYL0S'),
+('#7S003', 'GNova', 'wgnova@gmail.com', 'GN0VAEHFUTUR0!');
 
 -- EXIBIR DADOS INSERIDOS NA TABELA DE USUÁRIO
 select * from informacoesUsuario;
@@ -35,19 +34,23 @@ create table silos (
 idSilo int primary key auto_increment,
 numSilo int, 
 tamanhoSilo int,
-fkInformacoesUsuario int,
+fkInformacoesUsuario varchar(6),
 -- CHAVES ESTRANGEIRAS COSTUMAM VIR COMO "NULL" NAS TABELAS
-constraint fk_informacoes_usuario foreign key (fkinformacoesUsuario) references informacoesUsuario(idUsuario)
+constraint fk_informacoes_usuario foreign key (fkinformacoesUsuario) references informacoesUsuario(idAtivacao)
+-- CONSTRAINT SÃO OS REGRAS EM UMA TABELA DEFININDO SUA CHAVE (primary, foreign) E VALOR (null, not null),
+-- ALÉM DE FAZER VALIDAÇÃO DE INFORMAÇÕES (check), uma vez que a regra é criada pela constraint na tabela,
+-- essa regra poderá ser reutilizada em outras tabelas posteriores
 );
 
--- INSERIR VALORES NA TABELA DE SILOS, NOVAMENTE EXCLUINDO O ID POR SER AUTO_INCREMENT
+-- QUANDO UM VALOR É AUTO_INCREMENT OU NULL, NÃO É NECESSÁRIO COLOCAR SEUS DADOS NA TABELA, POIS ELES SE PREENCHEM SOZINHOS
 -- SE NÃO TIVESSE DEFINIDO OS VALORES DA CHAVE ESTRANGEIRA (ULTIMA COLUNA) ABAIXO, OS VALORES SERIAM NULOS
 -- É BOM DEFINIR PARA QUESTÃO DE ORGANIZAÇÃO DA TABELA
 insert into silos (numSilo, tamanhoSilo, fkInformacoesUsuario) values
-(2, 1000, 1),
-(2, 2000, 1),
-(1, 500, 2),
-(1, 720, 3);
+(1, 1000, '#7S001'),
+(2, 2000, '#7S001'),
+(1, 500, '#7S002'),
+(1, 720, '#7S003');
+
 
 -- EXIBIR INFORMAÇÕES DA TABELA DE SILOS
 select * from silos;
@@ -64,7 +67,7 @@ numSensor int,
 dtInstalacao date,
 tipoSensor varchar(1) not null,
 fkSilo int,
-fkInformacoesUsuario int,
+fkInformacoesUsuario varchar(6),
 constraint check (tipoSensor in('T', 'U')),
 -- É DADO UM CHECK PARA GARANTIR QUE OS TIPOS DE SENSORES SEJAM SOMENTE TEMPERATURA (T) E/OU UMIDADE (U)
 constraint fk_silo foreign key (fkSilo) references silos(idSilo)
@@ -75,49 +78,49 @@ constraint fk_silo foreign key (fkSilo) references silos(idSilo)
 insert into sensores (serialSensor, numSensor, dtInstalacao, tipoSensor, fkSilo, fkInformacoesUsuario) values
 -- A ORGANIZAÇÃO DOS DADOS FOI FEITA DA SEGUINTE FORMA:
 -- PRIMEIRO COLOCAMOS OS NÚMEROS CEREAIS DOS SENSORES DE UMIDADE, COLOCANDO A QUANTIDADE, 
--- DATA DE INSTALAÇÃO, TIPO DE SENSOR, A QUAL ID DE SILO ELE PERTENCE E A QUAL ID DE USUÁRIO PERTENCE
-('SU001', 1, '2024-02-13', 'U', 1, 1),
-('SU002', 2, '2024-02-13', 'U', 1, 1),
-('SU003', 3, '2024-02-13', 'U', 1, 1),
-('SU004', 4, '2024-02-13', 'U', 1, 1),
-('SU005', 5, '2024-02-13', 'U', 1, 1),
-('SU006', 1, '2024-02-14', 'U', 2, 1),
-('SU007', 2, '2024-02-14', 'U', 2, 1),
-('SU008', 3, '2024-02-14', 'U', 2, 1),
-('SU009', 4, '2024-02-14', 'U', 2, 1),
-('SU010', 5, '2024-02-14', 'U', 2, 1),
-('SU011', 1, '2023-12-31', 'U', 3, 2),
-('SU012', 2, '2023-12-31', 'U', 3, 2),
-('SU013', 3, '2023-12-31', 'U', 3, 2),
-('SU014', 4, '2023-12-31', 'U', 3, 2),
-('SU015', 5, '2023-12-31', 'U', 3, 2),
-('SU016', 1, '2024-01-30', 'U', 4, 3),
-('SU017', 2, '2024-01-30', 'U', 4, 3),
-('SU018', 3, '2024-01-30', 'U', 4, 3),
-('SU019', 4, '2024-01-30', 'U', 4, 3),
-('SU020', 5, '2024-01-30', 'U', 4, 3),
+-- DATA DE INSTALAÇÃO, TIPO DE SENSOR, A QUAL ID DE SILO ELE PERTENCE E A QUAL ID DE ATIVAÇÃO PERTENCE
+('SU001', 1, '2024-02-13', 'U', 1, '#7S001'),
+('SU002', 2, '2024-02-13', 'U', 1, '#7S001'),
+('SU003', 3, '2024-02-13', 'U', 1, '#7S001'),
+('SU004', 4, '2024-02-13', 'U', 1, '#7S001'),
+('SU005', 5, '2024-02-13', 'U', 1, '#7S001'),
+('SU006', 1, '2024-02-14', 'U', 2, '#7S001'),
+('SU007', 2, '2024-02-14', 'U', 2, '#7S001'),
+('SU008', 3, '2024-02-14', 'U', 2, '#7S001'),
+('SU009', 4, '2024-02-14', 'U', 2, '#7S001'),
+('SU010', 5, '2024-02-14', 'U', 2, '#7S001'),
+('SU011', 1, '2023-12-31', 'U', 3, '#7S002'),
+('SU012', 2, '2023-12-31', 'U', 3, '#7S002'),
+('SU013', 3, '2023-12-31', 'U', 3, '#7S002'),
+('SU014', 4, '2023-12-31', 'U', 3, '#7S002'),
+('SU015', 5, '2023-12-31', 'U', 3, '#7S002'),
+('SU016', 1, '2024-01-30', 'U', 4, '#7S003'),
+('SU017', 2, '2024-01-30', 'U', 4, '#7S003'),
+('SU018', 3, '2024-01-30', 'U', 4, '#7S003'),
+('SU019', 4, '2024-01-30', 'U', 4, '#7S003'),
+('SU020', 5, '2024-01-30', 'U', 4, '#7S003'),
 -- LOGO APÓS É INSERIDO OS VALORES DE SENSOR DE TEMPERATURA, SEGUINDO O MESMO ESQUEMA DO ANTERIOR,
 -- COMEÇANDO A PARTIR DO 001 POR SER UM NÚMERO CEREAL DIFERENTE
-('ST001', 1, '2024-02-13', 'T', 1, 1),
-('ST002', 2, '2024-02-13', 'T', 1, 1),
-('ST003', 3, '2024-02-13', 'T', 1, 1),
-('ST004', 4, '2024-02-13', 'T', 1, 1),
-('ST005', 5, '2024-02-13', 'T', 1, 1),
-('ST006', 1, '2024-02-14', 'T', 2, 1),
-('ST007', 2, '2024-02-14', 'T', 2, 1),
-('ST008', 3, '2024-02-14', 'T', 2, 1),
-('ST009', 4, '2024-02-14', 'T', 2, 1),
-('ST010', 5, '2024-02-14', 'T', 2, 1),
-('ST011', 1, '2023-12-31', 'T', 3, 2),
-('ST012', 2, '2023-12-31', 'T', 3, 2),
-('ST013', 3, '2023-12-31', 'T', 3, 2),
-('ST014', 4, '2023-12-31', 'T', 3, 2),
-('ST015', 5, '2023-12-31', 'T', 3, 2),
-('ST016', 1, '2024-01-30', 'T', 4, 3),
-('ST017', 2, '2024-01-30', 'T', 4, 3),
-('ST018', 3, '2024-01-30', 'T', 4, 3),
-('ST019', 4, '2024-01-30', 'T', 4, 3),
-('ST020', 5, '2024-01-30', 'T', 4, 3);
+('ST001', 1, '2024-02-13', 'T', 1, '#7S001'),
+('ST002', 2, '2024-02-13', 'T', 1, '#7S001'),
+('ST003', 3, '2024-02-13', 'T', 1, '#7S001'),
+('ST004', 4, '2024-02-13', 'T', 1, '#7S001'),
+('ST005', 5, '2024-02-13', 'T', 1, '#7S001'),
+('ST006', 1, '2024-02-14', 'T', 2, '#7S001'),
+('ST007', 2, '2024-02-14', 'T', 2, '#7S001'),
+('ST008', 3, '2024-02-14', 'T', 2, '#7S001'),
+('ST009', 4, '2024-02-14', 'T', 2, '#7S001'),
+('ST010', 5, '2024-02-14', 'T', 2, '#7S001'),
+('ST011', 1, '2023-12-31', 'T', 3, '#7S002'),
+('ST012', 2, '2023-12-31', 'T', 3, '#7S002'),
+('ST013', 3, '2023-12-31', 'T', 3, '#7S002'),
+('ST014', 4, '2023-12-31', 'T', 3, '#7S002'),
+('ST015', 5, '2023-12-31', 'T', 3, '#7S002'),
+('ST016', 1, '2024-01-30', 'T', 4, '#7S003'),
+('ST017', 2, '2024-01-30', 'T', 4, '#7S003'),
+('ST018', 3, '2024-01-30', 'T', 4, '#7S003'),
+('ST019', 4, '2024-01-30', 'T', 4, '#7S003'),
+('ST020', 5, '2024-01-30', 'T', 4, '#7S003');
 
 -- EXIBIR INFORMAÇÕES DA TABELA DE SENSORES
 select * from sensores;
@@ -135,9 +138,9 @@ inner join sensores as sn
 on sn.fkSilo = sl.idSilo
 -- "AND" É UTILIZADO PELO FATO DE EXISTIR MAIS DE DUAS TABELAS A SEREM RELACIONADAS,
 -- ENTÃO DIZEMOS QUE SE O VALOR ANTERIOR FOR CORRETO E ESSE TAMBÉM, OS RESULTADOS APARECEM
--- EX: SE O VALOR DA CHAVE ESTRANGEIRA REFERENTE AO ID DO USUÁRIO NA TABELA SENSORES
--- FOR IGUAL AO VALOR DA CHAVE PRIMÁRIA REFERENTE AO ID DO USUÁRIO NA TABELA USUÁRIO, OS RESULTADOS APARECEM  
-and sl.fkInformacoesUsuario = iu.idUsuario;
+-- EX: SE O VALOR DA CHAVE ESTRANGEIRA REFERENTE AO ID DE ATIVAÇÃO DA CONTA DO USUÁRIO NA TABELA SENSORES
+-- FOR IGUAL AO VALOR DA CHAVE PRIMÁRIA REFERENTE AO ID DE ATIVAÇÃO NA TABELA USUÁRIO, OS RESULTADOS APARECEM  
+and sl.fkInformacoesUsuario = iu.idAtivacao;
 
 -- OUTRA VARIAÇÃO DE EXIBIÇÃO DE DADOS DE UMA MANEIRA MAIS LIMPA, ONDE É APRESENTADO
 -- NOME E EMAIL DO USUARIO ("iu" É O APELIDO DA TABELA DE USUÁRIO, LOGO ADICIONO QUAL COLUNA QUERO DESSA TABELA)
@@ -153,7 +156,7 @@ inner join silos as sl
 inner join sensores as sn 
 -- PARA UMA APRESENTAÇÃO CLARA E CORRETA, DEFINO QUE OS VALORES DEVEM SER IGUAIS NAS TABELAS SELECIONADAS
 on sn.fkSilo = sl.idSilo 
-and sl.fkInformacoesUsuario = iu.idUsuario;
+and sl.fkInformacoesUsuario = iu.idAtivacao;
 
 -- PARA LIMPAR OS DADOS DAS TABELAS, USAMOS:
 truncate table informacoesUsuario;
