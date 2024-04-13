@@ -1,2 +1,2 @@
 # Banco-de-Dados
-Recursos de banco de dados específicos do projeto 7Sojas (Scripts, modelagem e documentação)
+Modelos individuais desenvolvidos por cada integrante, com o objetivo de criar um modelo de banco de dados final.
