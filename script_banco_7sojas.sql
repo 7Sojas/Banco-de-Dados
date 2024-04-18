@@ -1,7 +1,7 @@
 -- Criação do banco de dados
 create database sojas7;
 
-drop database sojas7;
+
 -- utilizar o banco
 use sojas7;
 
