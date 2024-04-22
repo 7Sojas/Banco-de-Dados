@@ -13,17 +13,16 @@ email varchar(80) not null,
 senha varchar(40) not null,
 telefone_1 varchar(11) not null,
 telefone_2 varchar(11) null,
-codigoAtivacao varchar(12) not null
 );
 
 -- Dados inseridos na tabela Usuario
-insert into usuario (nome, cpf,email, senha, telefone_1, telefone_2, codigoAtivacao)
-values('Bianca Almeida','42312343343','rafaalmeida@gmail.com','','11987651233','11936521478',''),
-('Murillo Rodrigues','25485698512','mrodrigues@gmail.com','','11914523698','11998765412',''),
-('Gustavo Alencar','96325874112','gusalencar@gmail.com','','11968532147','11965483249',''),
-('Ana Beatriz Costa','54687932145','anabeacosta@gmail.com','','11914578236','11998984547',''),
-('Miguel Pinho','96478512354','mipinho@gmail.com','','11998765413','11965425115',''),
-('Davi de Souza','15975365487','davisouza@gmail.com','','11960605454','11912365478','');
+insert into usuario (nome, cpf,email, senha, telefone_1, telefone_2)
+values('Bianca Almeida','42312343343','rafaalmeida@gmail.com','','11987651233','11936521478'),
+('Murillo Rodrigues','25485698512','mrodrigues@gmail.com','','11914523698','11998765412'),
+('Gustavo Alencar','96325874112','gusalencar@gmail.com','','11968532147','11965483249'),
+('Ana Beatriz Costa','54687932145','anabeacosta@gmail.com','','11914578236','11998984547'),
+('Miguel Pinho','96478512354','mipinho@gmail.com','','11998765413','11965425115'),
+('Davi de Souza','15975365487','davisouza@gmail.com','','11960605454','11912365478');
 
 
 -- Tabela endereço que se relacionará com a tabela Usuário 
