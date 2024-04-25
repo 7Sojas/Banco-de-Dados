@@ -113,7 +113,7 @@ create table leituraSensor (
 id int primary key auto_increment,
 umidadeDht float not null,
 temperaturaLm float not null,
-dataHora datetime null,
+dataHora timestamp not null default current_timestamp,
 fkSensor int null,
 constraint fk_sensor_leitura foreign key (fkSensor) references sensor (idSensor)
 );
