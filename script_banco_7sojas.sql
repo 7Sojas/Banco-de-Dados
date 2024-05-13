@@ -7,44 +7,41 @@ use sojas7;
 -- Tabela usuário, onde conterá todas as informções pertinentes para o cadastro do cliente em nosso sistema
 create table usuario (
 idUsuario int primary key auto_increment,
-nome varchar(50) not null,
-cpf varchar(11) not null,
+nomeCompleto varchar(50) not null,
 email varchar(80) not null,
-senha varchar(40) not null,
-telefone_1 varchar(11) not null,
-telefone_2 varchar(11) null
+cpf varchar(11) not null,
+telefone varchar(11) not null,
+senha varchar(40) not null
 );
 
 -- Dados inseridos na tabela Usuario
-insert into usuario (nome, cpf,email, senha, telefone_1, telefone_2)
-values('Bianca Almeida','42312343343','rafaalmeida@gmail.com','Bianca123@','11987651233','11936521478'),
-('Murillo Rodrigues','25485698512','mrodrigues@gmail.com','Murillo#123','11914523698','11998765412'),
-('Gustavo Alencar','96325874112','gusalencar@gmail.com','Gustavo*123','11968532147','11965483249'),
-('Ana Beatriz Costa','54687932145','anabeacosta@gmail.com','Ana@#123','11914578236','11998984547'),
-('Miguel Pinho','96478512354','mipinho@gmail.com','Miguel#123','11998765413','11965425115'),
-('Davi de Souza','15975365487','davisouza@gmail.com','Davi@123*','11960605454','11912365478');
+insert into usuario (nome, email, cpf, telefone, senha)
+values('Bianca Almeida', 'bialmeida@gmail.com', '42312343343', '11987651233', 'Bianca123@'),
+('Murillo Rodrigues', 'murirodrigues@gmail.com', '25485698512', '11914523698', 'Murillo#123'),
+('Gustavo Alencar', 'gusalencar@gmail.com', '96325874112', '11968532147', 'Gustavo*123'),
+('Ana Beatriz Costa', 'anabeacosta@gmail.com', '54687932145', '11914578236', 'Ana@#123'),
+('Miguel Pinho', 'mipinho@gmail.com', '96478512354', '11998765413', 'Miguel#123'),
+('Davi de Souza', 'davisouza@gmail.com', '15975365487', '11960605454', 'Davi@123*');
 
 
 -- Tabela endereço que se relacionará com a tabela Usuário 
 create table endereco (
 idEndereco int primary key auto_increment,
-logradouro varchar(50),
-numeroLogradouro int,
-bairro varchar(50),
-cidade varchar(50),
-pais varchar(50), 
-fkUsuario int,
-constraint fk_Usuario_Endereco foreign key (fkUsuario) references usuario (idUsuario)
+logradouro varchar(50) not null,
+numero int not null,
+cep varchar(50) not null,
+fkUsuario int not null,
+constraint fk_usuario_endereco foreign key (fkUsuario) references usuario (idUsuario)
 );
 
 -- Dados inseridos na tabela endereco
-insert into endereco (logradouro,numeroLogradouro, bairro, cidade, pais, fkUsuario)
-values ('Rua Frei Caneca',12,'Novo Horizonte','Osasco','Brasil', 1),
-('Rua Adalberto Sampaio',432,'Vila Dirce','Mogi das Cruzes','Brasil', 2),
-('Av. Jupiter',23,'Planalto','Embu das Artes','Brasil', 3),
-('Rua Cachoeira Poraque',325,'Conceição','Cotia','Brasil', 4),
-('Rua Trilho Alto',112,'Jardim da Glória','Itaquera','Brasil', 5),
-('Rua Rio Bravo',2443,'Santa Maria','Guarulhos','Brasil', 6);
+insert into endereco (logradouro,numero, cep, fkUsuario)
+values ('Rua Frei Caneca', 12,'01317122', 1),
+('Rua Adalberto Sampaio', 432,'01421123', 2),
+('Avenida Jupiter', 23,'03288012', 3),
+('Rua Cachoeira Poraque', 325,'01211001', 4),
+('Rua Trilho Alto', 112,'02020123', 5),
+('Rua Rio Bravo', 2443,'04141000', 6);
 
 
 --  a Tabela Propriedade onde o usuário irá informa onde se encontra a fazenda em que os silos serão aplicados
@@ -52,69 +49,70 @@ create table propriedade (
 idPropriedade int primary key auto_increment,
 nome varchar(45) not null,
 proprietario varchar(45) null,
-CEP varchar(8) not null,
 fkUsuario int not null,
-constraint fk_Usuario_Propriedade foreign key (fkUsuario) references usuario (idUsuario)
+constraint fk_usuario_propriedade foreign key (fkUsuario) references usuario (idUsuario)
 );
 
 -- Dados inseridos na tabela propriedade
-insert into propriedade (nome,proprietario,CEP, fkUsuario)
-values ('Grãos Porte','Ailton Menezes','06541215', 1),
-('Outra Soja','Lucas Nobrega','06541215', 2),
-('Nova Grains','Raissa Martins','06541215', 3),
-('Agro Grãos','Moacir Estefano','06541215', 4),
-('Plante Grains','Silvia Montes','06541215', 5),
-('Natura Grãos','Carlos Silva','06541215', 6 );
+insert into propriedade (nome,proprietario, fkUsuario)
+values ('Grãos Porte','Ailton Menezes', 1),
+('Outra Soja', 'Lucas Nobrega', 2),
+('Nova Grains', 'Raissa Martins', 3),
+('Agro Grãos', null, 4),
+('Plante Grains', 'Silvia Montes', 5),
+('Natura Grãos', null, 6 );
 
 -- Tabela de Silos, interligada com a propriedade para qual será destinada (capacidade em toneladas)
 create table silos (
 idSilo int primary key auto_increment,
-tipo varchar(45) not null,
-capacidade_Max int not null,
+tipo varchar(45) null,
+capacidade_Max decimal(10,2) not null,
 sensores varchar(45) not null,
 fkPropriedade int not null,
-constraint fk_Propriedade_Silos foreign key (fkPropriedade) references propriedade (idPropriedade)
+alertaVermelho decimal(10,2) null,
+alertaAmarelo decimal(10,2) null,
+constraint fk_propriedade_silos foreign key (fkPropriedade) references propriedade (idPropriedade)
 );
 
 insert into silos (tipo, capacidade_Max, sensores,fkPropriedade )
-values('metálico','60','LM35 e DHT11',1),
+values('metálico','60.5','LM35 e DHT11',1),
 ('metálico','80','LM35 e DHT11',2),
-('metálico','60','LM35 e DHT11',3),
-('metálico','60','LM35 e DHT11',4),
-('metálico','80','LM35 e DHT11',5),
-('metálico','60','LM35 e DHT11',6);
+('metálico','70','LM35 e DHT11',3),
+('metálico','65','LM35 e DHT11',4),
+('metálico','93.5','LM35 e DHT11',5),
+('metálico','55','LM35 e DHT11',6);
 
 -- Tabela dos sensores, interligado a tabela silos
 create table sensor (
 idSensor int primary key auto_increment,
 tipo varchar(45) not null,
-quantidade int not null,
+quantidade int null,
 fkSilo int not null,
 constraint fk_silo_sensor foreign key (fkSilo) references silos (idSilo),
 constraint check_tipo check (tipo in ('LM35','DHT11'))
 );
 
 insert into sensor(tipo,quantidade,fksilo)
-values('LM35',4,1),
-('DHT11',4,1),
-('LM35',3,2),
-('DHT11',3,2),
-('LM35',2,3),
-('DHT11',2,3),
-('LM35',4,4),
-('DHT11',4,4),
-('LM35',2,5),
-('DHT11',2,5),
-('LM35',4,6),
-('DHT11',4,6);
+values('LM35', 4, 1),
+('DHT11', 4, 1),
+('LM35', 3, 2),
+('DHT11', 3, 2),
+('LM35', 2, 3),
+('DHT11', 2, 3),
+('LM35', 4, 4),
+('DHT11', 4, 4),
+('LM35', 2, 5),
+('DHT11', 2, 5),
+('LM35', 4, 6),
+('DHT11', 4, 6);
 
 -- Tabela para a leitura dos sensores com auxilia da API
 create table leituraSensor (
-id int primary key auto_increment,
+idLeitura int primary key auto_increment,
 umidadeDht float not null,
 temperaturaLm float not null,
 dataHora timestamp not null default current_timestamp,
-fkSensor int null,
+fkSensor int not null,
 constraint fk_sensor_leitura foreign key (fkSensor) references sensor (idSensor)
 );
 
@@ -126,6 +124,11 @@ select * from propriedade;
 select * from silos;
 select * from sensor;
 select * from leituraSensor;
+
+-- inner join iD sensor com dados do sensor;
+select sens.idSensor, leitura.umidadeDht, leitura.temperaturaLm, leitura.dataHora
+from sensor sens
+inner join leituraSensor leitura on leitura.fkSensor = sens.idSensor;
 
 
 -- Selecionar o id do Usuario, nome do Usuario, CPF, Email, telefone principal, logradouro, numero, bairro, cidade, pais, nome da propriedade, proprietario e cep da propriedade
@@ -146,3 +149,4 @@ select u.idUsuario 'iD Usuario',
 from usuario u
 inner join endereco e on e.fkUsuario = u.idUsuario
 inner join propriedade p on p.fkUsuario = u.idUsuario;
+
