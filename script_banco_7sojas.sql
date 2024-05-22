@@ -7,21 +7,20 @@ use sojas7;
 -- Tabela usuário, onde conterá todas as informções pertinentes para o cadastro do cliente em nosso sistema
 create table usuario (
 idUsuario int primary key auto_increment,
-nomeCompleto varchar(50) not null,
+nome varchar(50) not null,
 email varchar(80) not null,
 cpf varchar(11) not null,
-telefone varchar(11) not null,
 senha varchar(40) not null
 );
 
 -- Dados inseridos na tabela Usuario
-insert into usuario (nome, email, cpf, telefone, senha)
-values('Bianca Almeida', 'bialmeida@gmail.com', '42312343343', '11987651233', 'Bianca123@'),
-('Murillo Rodrigues', 'murirodrigues@gmail.com', '25485698512', '11914523698', 'Murillo#123'),
-('Gustavo Alencar', 'gusalencar@gmail.com', '96325874112', '11968532147', 'Gustavo*123'),
-('Ana Beatriz Costa', 'anabeacosta@gmail.com', '54687932145', '11914578236', 'Ana@#123'),
-('Miguel Pinho', 'mipinho@gmail.com', '96478512354', '11998765413', 'Miguel#123'),
-('Davi de Souza', 'davisouza@gmail.com', '15975365487', '11960605454', 'Davi@123*');
+insert into usuario (nome, email, cpf, senha)
+values('Bianca Almeida', 'bialmeida@gmail.com', '42312343343', 'Bianca123@'),
+('Murillo Rodrigues', 'murirodrigues@gmail.com', '25485698512', 'Murillo#123'),
+('Gustavo Alencar', 'gusalencar@gmail.com', '96325874112', 'Gustavo*123'),
+('Ana Beatriz Costa', 'anabeacosta@gmail.com', '54687932145', 'Ana@#123'),
+('Miguel Pinho', 'mipinho@gmail.com', '96478512354', 'Miguel#123'),
+('Davi de Souza', 'davisouza@gmail.com', '15975365487', 'Davi@123*');
 
 
 -- Tabela endereço que se relacionará com a tabela Usuário 
@@ -66,15 +65,14 @@ values ('Grãos Porte','Ailton Menezes', 1),
 create table silos (
 idSilo int primary key auto_increment,
 tipo varchar(45) null,
-capacidade_Max decimal(10,2) not null,
+capacidadeMax decimal(10,2) not null,
 sensores varchar(45) not null,
 fkPropriedade int not null,
-alertaVermelho decimal(10,2) null,
-alertaAmarelo decimal(10,2) null,
+constraint chk_sensores check (sensores in ('LM35', 'DHT11', 'LM35 e DHT11')),
 constraint fk_propriedade_silos foreign key (fkPropriedade) references propriedade (idPropriedade)
 );
 
-insert into silos (tipo, capacidade_Max, sensores,fkPropriedade )
+insert into silos (tipo, capacidadeMax, sensores,fkPropriedade )
 values('metálico','60.5','LM35 e DHT11',1),
 ('metálico','80','LM35 e DHT11',2),
 ('metálico','70','LM35 e DHT11',3),
@@ -105,6 +103,15 @@ values('LM35', 4, 1),
 ('DHT11', 2, 5),
 ('LM35', 4, 6),
 ('DHT11', 4, 6);
+
+-- Tabela para alertas de um determinado sensor
+create table alerta (
+idAlerta int primary key auto_increment,
+alerta decimal(10,2),
+dataHora timestamp not null default current_timestamp,
+fkSensor int not null,
+constraint fk_sensor_alerta foreign key (fkSensor) references sensor (idSensor)
+);
 
 -- Tabela para a leitura dos sensores com auxilia da API
 create table leituraSensor (
