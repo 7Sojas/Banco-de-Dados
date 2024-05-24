@@ -6,7 +6,7 @@ use sojas7;
 
 -- Tabela usuário, onde conterá todas as informções pertinentes para o cadastro do cliente em nosso sistema
 create table usuario (
-idUsuario int primary key auto_increment,
+id int primary key auto_increment,
 nome varchar(50) not null,
 email varchar(80) not null,
 cpf varchar(11) not null,
@@ -25,51 +25,51 @@ values('Bianca Almeida', 'bialmeida@gmail.com', '42312343343', 'Bianca123@'),
 
 -- Tabela endereço que se relacionará com a tabela Usuário 
 create table endereco (
-idEndereco int primary key auto_increment,
+id int primary key auto_increment,
 logradouro varchar(50) not null,
 numero int not null,
-cep varchar(50) not null,
-fkUsuario int not null,
-constraint fk_usuario_endereco foreign key (fkUsuario) references usuario (idUsuario)
+cep varchar(50) not null
 );
 
 -- Dados inseridos na tabela endereco
-insert into endereco (logradouro,numero, cep, fkUsuario)
-values ('Rua Frei Caneca', 12,'01317122', 1),
-('Rua Adalberto Sampaio', 432,'01421123', 2),
-('Avenida Jupiter', 23,'03288012', 3),
-('Rua Cachoeira Poraque', 325,'01211001', 4),
-('Rua Trilho Alto', 112,'02020123', 5),
-('Rua Rio Bravo', 2443,'04141000', 6);
+insert into endereco (logradouro,numero, cep)
+values ('Rua Frei Caneca', 12,'01317122'),
+('Rua Adalberto Sampaio', 432,'01421123'),
+('Avenida Jupiter', 23,'03288012'),
+('Rua Cachoeira Poraque', 325,'01211001'),
+('Rua Trilho Alto', 112,'02020123'),
+('Rua Rio Bravo', 2443,'04141000');
 
 
 --  a Tabela Propriedade onde o usuário irá informa onde se encontra a fazenda em que os silos serão aplicados
 create table propriedade (
-idPropriedade int primary key auto_increment,
+id int primary key auto_increment,
 nome varchar(45) not null,
 proprietario varchar(45) null,
+fkEndereco int not null,
 fkUsuario int not null,
-constraint fk_usuario_propriedade foreign key (fkUsuario) references usuario (idUsuario)
+constraint fk_endereco_propriedade foreign key (fkEndereco) references endereco (id),
+constraint fk_usuario_propriedade foreign key (fkUsuario) references usuario (id)
 );
 
 -- Dados inseridos na tabela propriedade
-insert into propriedade (nome,proprietario, fkUsuario)
-values ('Grãos Porte','Ailton Menezes', 1),
-('Outra Soja', 'Lucas Nobrega', 2),
-('Nova Grains', 'Raissa Martins', 3),
-('Agro Grãos', null, 4),
-('Plante Grains', 'Silvia Montes', 5),
-('Natura Grãos', null, 6 );
+insert into propriedade (nome,proprietario, fkEndereco, fkUsuario)
+values ('Grãos Porte','Ailton Menezes', 1, 1),
+('Outra Soja', 'Lucas Nobrega', 2, 2),
+('Nova Grains', 'Raissa Martins', 3, 3),
+('Agro Grãos', null, 4, 4),
+('Plante Grains', 'Silvia Montes', 5, 5),
+('Natura Grãos', null, 6, 6);
 
 -- Tabela de Silos, interligada com a propriedade para qual será destinada (capacidade em toneladas)
 create table silos (
-idSilo int primary key auto_increment,
+id int primary key auto_increment,
 tipo varchar(45) null,
 capacidadeMax decimal(10,2) not null,
 sensores varchar(45) not null,
 fkPropriedade int not null,
 constraint chk_sensores check (sensores in ('LM35', 'DHT11', 'LM35 e DHT11')),
-constraint fk_propriedade_silos foreign key (fkPropriedade) references propriedade (idPropriedade)
+constraint fk_propriedade_silos foreign key (fkPropriedade) references propriedade (id)
 );
 
 insert into silos (tipo, capacidadeMax, sensores,fkPropriedade )
@@ -82,11 +82,11 @@ values('metálico','60.5','LM35 e DHT11',1),
 
 -- Tabela dos sensores, interligado a tabela silos
 create table sensor (
-idSensor int primary key auto_increment,
+id int primary key auto_increment,
 tipo varchar(45) not null,
 quantidade int null,
 fkSilo int not null,
-constraint fk_silo_sensor foreign key (fkSilo) references silos (idSilo),
+constraint fk_silo_sensor foreign key (fkSilo) references silos (id),
 constraint check_tipo check (tipo in ('LM35','DHT11'))
 );
 
@@ -104,25 +104,24 @@ values('LM35', 4, 1),
 ('LM35', 4, 6),
 ('DHT11', 4, 6);
 
--- Tabela para alertas de um determinado sensor
-create table alerta (
-idAlerta int primary key auto_increment,
-alerta decimal(10,2),
-dataHora timestamp not null default current_timestamp,
-fkSensor int not null,
-constraint fk_sensor_alerta foreign key (fkSensor) references sensor (idSensor)
-);
-
 -- Tabela para a leitura dos sensores com auxilia da API
 create table leituraSensor (
-idLeitura int primary key auto_increment,
+id int primary key auto_increment,
 umidadeDht float not null,
 temperaturaLm float not null,
 dataHora timestamp not null default current_timestamp,
 fkSensor int not null,
-constraint fk_sensor_leitura foreign key (fkSensor) references sensor (idSensor)
+constraint fk_sensor_leitura foreign key (fkSensor) references sensor (id)
 );
 
+-- Tabela para alertas de um determinado sensor
+create table alerta (
+id int primary key auto_increment,
+alertaVermelho decimal(10,2),
+alertaAmarelo decimal(10,2),
+fkLeitura int not null,
+constraint fk_leituraSensor_alerta foreign key (fkLeitura) references leituraSensor (id)
+);
 
 -- Selecionar todos os dados de cada tabela
 select * from usuario;
