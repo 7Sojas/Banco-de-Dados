@@ -65,23 +65,21 @@ values ('Grãos Porte','Ailton Menezes', 1, 1),
 create table silos (
 id int primary key auto_increment,
 tipo varchar(45) null,
-capacidadeMax decimal(10,2) not null,
 temperaturaMax int not null,
 temperaturaMin int not null,
 umidadeMax int not null,
 umidadeMin int not null,
 fkPropriedade int not null,
-constraint chk_sensores check (sensores in ('LM35', 'DHT11', 'LM35 e DHT11')),
 constraint fk_propriedade_silos foreign key (fkPropriedade) references propriedade (id)
 );
 
-insert into silos (tipo, capacidadeMax, sensores,fkPropriedade )
-values('metálico','60.5','LM35 e DHT11',1),
-('metálico','80','LM35 e DHT11',2),
-('metálico','70','LM35 e DHT11',3),
-('metálico','65','LM35 e DHT11',4),
-('metálico','93.5','LM35 e DHT11',5),
-('metálico','55','LM35 e DHT11',6);
+insert into silos (tipo, temperaturaMax, temperaturaMin, umidadeMax, umidadeMin, fkPropriedade )
+values('metálico', '40', '30', '70', '60',1),
+('metálico', '40', '30', '70', '60', 2),
+('metálico', '39', '31', '70', '60', 3),
+('metálico', '41', '29', '65', '55', 4),
+('metálico', '38', '30', '60', '50', 5),
+('metálico', '40', '30', '50', '40', 6);
 
 -- Tabela dos sensores, interligado a tabela silos
 create table sensor (
