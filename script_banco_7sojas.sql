@@ -7,7 +7,7 @@ use sojas7;
 -- Tabela usuário, onde conterá todas as informções pertinentes para o cadastro do cliente em nosso sistema
 create table usuario (
 id int primary key auto_increment,
-nome varchar(50) not null,
+nome varchar(50) not null,	
 email varchar(80) not null,
 cpf varchar(11) not null,
 senha varchar(40) not null
@@ -66,7 +66,10 @@ create table silos (
 id int primary key auto_increment,
 tipo varchar(45) null,
 capacidadeMax decimal(10,2) not null,
-sensores varchar(45) not null,
+temperaturaMax int not null,
+temperaturaMin int not null,
+umidadeMax int not null,
+umidadeMin int not null,
 fkPropriedade int not null,
 constraint chk_sensores check (sensores in ('LM35', 'DHT11', 'LM35 e DHT11')),
 constraint fk_propriedade_silos foreign key (fkPropriedade) references propriedade (id)
@@ -155,4 +158,3 @@ select u.idUsuario 'iD Usuario',
 from usuario u
 inner join endereco e on e.fkUsuario = u.idUsuario
 inner join propriedade p on p.fkUsuario = u.idUsuario;
-
