@@ -1,6 +1,6 @@
 -- Criação do banco de dados
+drop database sojas7;
 create database sojas7;
-
 -- utilizar o banco
 use sojas7;
 
@@ -85,25 +85,32 @@ values('metálico', '40', '30', '70', '60',1),
 create table sensor (
 id int primary key auto_increment,
 tipo varchar(45) not null,
-quantidade int null,
 fkSilo int not null,
 constraint fk_silo_sensor foreign key (fkSilo) references silos (id),
 constraint check_tipo check (tipo in ('LM35','DHT11'))
 );
 
-insert into sensor(tipo,quantidade,fksilo)
-values('LM35', 4, 1),
-('DHT11', 4, 1),
-('LM35', 3, 2),
-('DHT11', 3, 2),
-('LM35', 2, 3),
-('DHT11', 2, 3),
-('LM35', 4, 4),
-('DHT11', 4, 4),
-('LM35', 2, 5),
-('DHT11', 2, 5),
-('LM35', 4, 6),
-('DHT11', 4, 6);
+insert into sensor(tipo,fksilo)
+values('DHT11', 1),
+('DHT11', 1),
+('DHT11', 1),
+('DHT11', 1),
+('LM35', 1),
+('LM35', 1),
+('LM35', 1),
+('LM35', 1),
+('DHT11', 2),
+('DHT11', 2),
+('DHT11', 2),
+('DHT11', 2),
+('LM35', 2),
+('LM35', 2),
+('LM35', 2),
+('LM35', 2);
+
+-- select fkSilo por id do Sensor
+select id from sensor where fkSilo = 1 and tipo = 'LM35';
+
 
 -- Tabela para a leitura dos sensores com auxilia da API
 create table leituraSensor (
