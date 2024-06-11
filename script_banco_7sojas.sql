@@ -1,5 +1,6 @@
 -- Criação do banco de dados
 drop database sojas7;
+
 create database sojas7;
 -- utilizar o banco
 use sojas7;
@@ -65,10 +66,10 @@ values ('Grãos Porte','Ailton Menezes', 1, 1),
 create table silos (
 id int primary key auto_increment,
 tipo varchar(45) null,
-temperaturaMax int not null,
-temperaturaMin int not null,
-umidadeMax int not null,
-umidadeMin int not null,
+temperaturaMax decimal(10, 2) not null,
+temperaturaMin decimal(10, 2) not null,
+umidadeMax decimal(10, 2) not null,
+umidadeMin decimal(10, 2) not null,
 fkPropriedade int not null,
 constraint fk_propriedade_silos foreign key (fkPropriedade) references propriedade (id)
 );
@@ -87,26 +88,27 @@ id int primary key auto_increment,
 tipo varchar(45) not null,
 fkSilo int not null,
 constraint fk_silo_sensor foreign key (fkSilo) references silos (id),
-constraint check_tipo check (tipo in ('LM35','DHT11'))
+constraint check_tipo check (tipo in ('LM35','DHT11', 'DHT11 e LM35'))
 );
 
 insert into sensor(tipo,fksilo)
-values('DHT11', 1),
-('DHT11', 1),
-('DHT11', 1),
-('DHT11', 1),
-('LM35', 1),
-('LM35', 1),
-('LM35', 1),
-('LM35', 1),
-('DHT11', 2),
-('DHT11', 2),
-('DHT11', 2),
-('DHT11', 2),
-('LM35', 2),
-('LM35', 2),
-('LM35', 2),
-('LM35', 2);
+values
+('DHT11 e LM35', 1),
+('DHT11 e LM35', 1),
+('DHT11 e LM35', 1),
+('DHT11 e LM35', 1),
+('DHT11 e LM35', 2),
+('DHT11 e LM35', 2),
+('DHT11 e LM35', 2),
+('DHT11 e LM35', 2),
+('DHT11 e LM35', 3),
+('DHT11 e LM35', 3),
+('DHT11 e LM35', 3),
+('DHT11 e LM35', 3),
+('DHT11 e LM35', 4),
+('DHT11 e LM35', 4),
+('DHT11 e LM35', 4),
+('DHT11 e LM35', 4);
 
 -- select fkSilo por id do Sensor
 select id from sensor where fkSilo = 1 and tipo = 'LM35';
@@ -139,27 +141,29 @@ select * from silos;
 select * from sensor;
 select * from leituraSensor;
 
+-- Selecionar os valores de temperatura, umidade e dataHora para determinado fkSensor
+select * from leituraSensor where fkSensor = 1;
+select * from leituraSensor where fkSensor = 2;
+select * from leituraSensor where fkSensor = 3;
+select * from leituraSensor where fkSensor = 4;
+
 -- inner join iD sensor com dados do sensor;
-select sens.idSensor, leitura.umidadeDht, leitura.temperaturaLm, leitura.dataHora
+select sens.id, leitura.umidadeDht, leitura.temperaturaLm, leitura.dataHora
 from sensor sens
-inner join leituraSensor leitura on leitura.fkSensor = sens.idSensor;
+inner join leituraSensor leitura on leitura.fkSensor = sens.id;
+
+select s.id Sensor, 
+       ls.temperaturaLm Temperatura, 
+       ls.umidadeDht Umidade, 
+       ls.dataHora DataHora
+from leituraSensor as ls
+inner join sensor as s on s.id = ls.fkSensor
+where fkSensor >= 1 and fkSensor <= 3;
 
 
--- Selecionar o id do Usuario, nome do Usuario, CPF, Email, telefone principal, logradouro, numero, bairro, cidade, pais, nome da propriedade, proprietario e cep da propriedade
-select u.idUsuario 'iD Usuario',
-       u.nome 'Nome Usuario',
-       u.cpf CPF,
-       u.email Email,
-       u.senha Senha,
-       u.telefone_1 Telefone,
-       e.logradouro Logradouro,
-       e.numeroLogradouro Numero,
-       e.bairro Bairro,
-       e.cidade Cidade,
-       e.pais 'País',
-	   p.nome Propriedade,
-       p.proprietario Proprietario,
-       p.cep CEP
-from usuario u
-inner join endereco e on e.fkUsuario = u.idUsuario
-inner join propriedade p on p.fkUsuario = u.idUsuario;
+
+select *
+from propriedade p
+inner join silos s on s.fkpropriedade = p.id
+inner join sensor sen on sen.fksilo = s.id
+inner join leituraSensor ls on ls.fkSensor = sen.id;
