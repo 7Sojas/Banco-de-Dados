@@ -56,11 +56,11 @@ constraint fk_usuario_propriedade foreign key (fkUsuario) references usuario (id
 -- Dados inseridos na tabela propriedade
 insert into propriedade (nome,proprietario, fkEndereco, fkUsuario)
 values ('Grãos Porte','Ailton Menezes', 1, 1),
-('Outra Soja', 'Lucas Nobrega', 2, 2),
-('Nova Grains', 'Raissa Martins', 3, 3),
-('Agro Grãos', null, 4, 4),
-('Plante Grains', 'Silvia Montes', 5, 5),
-('Natura Grãos', null, 6, 6);
+('Agro Grãos', 'Arlindo Silva', 4, 1),
+('Outra Soja', 'Lucas Nobrega', 2, 1),
+('Natura Grãos', 'Marcos Menezes', 6, 1),
+('Nova Grains', 'Raissa Martins', 3, 2),
+('Plante Grains', 'Silvia Montes', 5, 2);
 
 -- Tabela de Silos, interligada com a propriedade para qual será destinada (capacidade em toneladas)
 create table silos (
@@ -75,12 +75,15 @@ constraint fk_propriedade_silos foreign key (fkPropriedade) references proprieda
 );
 
 insert into silos (tipo, temperaturaMax, temperaturaMin, umidadeMax, umidadeMin, fkPropriedade )
-values('metálico', '40', '30', '70', '60',1),
-('metálico', '40', '30', '70', '60', 2),
+values('metálico', '35', '20', '70', '20',1),
+('metálico', '35', '20', '70', '20', 1),
+('metálico', '35', '20', '70', '20', 1),
+('metálico', '35', '20', '70', '20', 1),
+('metálico', '40', '20', '70', '20', 2),
+('metálico', '40', '20', '70', '20', 2),
+('metálico', '40', '20', '70', '20', 2),
 ('metálico', '39', '31', '70', '60', 3),
-('metálico', '41', '29', '65', '55', 4),
-('metálico', '38', '30', '60', '50', 5),
-('metálico', '40', '30', '50', '40', 6);
+('metálico', '40', '30', '70', '60', 3);
 
 -- Tabela dos sensores, interligado a tabela silos
 create table sensor (
@@ -108,13 +111,21 @@ values
 ('DHT11 e LM35', 4),
 ('DHT11 e LM35', 4),
 ('DHT11 e LM35', 4),
-('DHT11 e LM35', 4);
+('DHT11 e LM35', 4),
+('DHT11 e LM35', 5),
+('DHT11 e LM35', 5),
+('DHT11 e LM35', 5),
+('DHT11 e LM35', 5),
+('DHT11 e LM35', 6),
+('DHT11 e LM35', 6),
+('DHT11 e LM35', 6),
+('DHT11 e LM35', 6),
+('DHT11 e LM35', 7),
+('DHT11 e LM35', 7),
+('DHT11 e LM35', 7),
+('DHT11 e LM35', 7);
 
--- select fkSilo por id do Sensor
-select id from sensor where fkSilo = 1 and tipo = 'LM35';
-
-
--- Tabela para a leitura dos sensores com auxilia da API
+-- Tabela para a leitura dos sensores com auxilio da API
 create table leituraSensor (
 id int primary key auto_increment,
 umidadeDht float not null,
@@ -127,11 +138,13 @@ constraint fk_sensor_leitura foreign key (fkSensor) references sensor (id)
 -- Tabela para alertas de um determinado sensor
 create table alerta (
 id int primary key auto_increment,
-alertaVermelho decimal(10,2),
-alertaAmarelo decimal(10,2),
-fkLeitura int not null,
-constraint fk_leituraSensor_alerta foreign key (fkLeitura) references leituraSensor (id)
+temperaturaLm decimal(10,2),
+umidadeDht decimal(10,2),
+dataAlerta timestamp default current_timestamp,
+fkSensor int not null,
+constraint fk_sensor_alerta foreign key (fkSensor) references sensor (id)
 );
+
 
 -- Selecionar todos os dados de cada tabela
 select * from usuario;
@@ -140,6 +153,7 @@ select * from propriedade;
 select * from silos;
 select * from sensor;
 select * from leituraSensor;
+select * from alerta;
 
 -- Selecionar os valores de temperatura, umidade e dataHora para determinado fkSensor
 select * from leituraSensor where fkSensor = 1;
@@ -160,10 +174,63 @@ from leituraSensor as ls
 inner join sensor as s on s.id = ls.fkSensor
 where fkSensor >= 1 and fkSensor <= 3;
 
+-- TRIGGER PARA INSERÇÃO DOS DADOS NA TABELA ALERTA QUANDO PASSAR DA TEMPERATURA OU UMIDADE
+DELIMITER //
 
+CREATE TRIGGER trg_check_sensor_data
+AFTER INSERT ON leituraSensor
+FOR EACH ROW
+BEGIN
+    DECLARE tempMax DECIMAL(10,2);
+    DECLARE tempMin DECIMAL(10,2);
+    DECLARE humMax DECIMAL(10,2);
+    DECLARE humMin DECIMAL(10,2);
 
-select *
-from propriedade p
-inner join silos s on s.fkpropriedade = p.id
-inner join sensor sen on sen.fksilo = s.id
-inner join leituraSensor ls on ls.fkSensor = sen.id;
+    -- Seleciona os limites da tabela silos
+    SELECT s.temperaturaMax, s.temperaturaMin, s.umidadeMax, s.umidadeMin
+    INTO tempMax, tempMin, humMax, humMin
+    FROM silos s
+    INNER JOIN sensor se ON s.id = se.fkSilo
+    WHERE se.id = NEW.fkSensor;
+
+    -- Verifica se os valores inseridos ultrapassam os limites
+    IF NEW.temperaturaLm > tempMax OR NEW.temperaturaLm < tempMin OR
+       NEW.umidadeDht > humMax OR NEW.umidadeDht < humMin THEN
+        INSERT INTO alerta (fkSensor, temperaturaLm, umidadeDht, dataAlerta)
+        VALUES (NEW.fkSensor, NEW.temperaturaLm, NEW.umidadeDht, NOW());
+    END IF;
+END//
+
+DELIMITER ;
+
+insert into leituraSensor (umidadeDht, temperaturaLm, fkSensor) values
+(45, 55, 8);
+
+-- SELECIONA TODOS OS ALERTAS DE DETERMINADO SILO
+select a.*,
+       s.id SENSOR,
+       si.id SILO
+from alerta a
+inner join sensor s on s.id = a.fkSensor
+inner join silos si on si.id = s.fkSilo
+where si.id = 2 and a.id is not null;
+
+-- SELECIONA O SILO QUE ESTA COM ALGUM ALERTA
+select distinct(si.id) SILO,
+       s.id SENSOR,
+       a.id ALERTA
+from silos si
+inner join sensor s on si.id = s.fkSilo
+inner join alerta a on a.fkSensor = s.id
+where a.id is not null;
+
+select count(sen.id)
+from sensor sen
+inner join silos si on si.id = sen.fkSilo
+where si.id = 1;
+
+select count(distinct(s.id)) 'SENSOR ALERTA'
+from sensor s
+inner join silos si on si.id = s.fkSilo
+inner join alerta a on a.fkSensor = s.id
+where si.id = 3 and a.id is not null;
